@@ -13,7 +13,7 @@ import { Request, Response, NextFunction } from 'express';
 import { HttpError } from './types/errors';
 import bcrypt from 'bcryptjs';
 import indexRouter from './routes/index';
-
+import flash from 'connect-flash';
 
 
 const app = express();
@@ -32,6 +32,7 @@ app.use(cors((req, callback) => {
       callback(null, corsOptions)
 }));
 
+app.use(flash());
 app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
@@ -87,22 +88,21 @@ passport.deserializeUser((userId: any, done) => {
 });
 
 //TODO: DELETE THIS AFTER TESTING
-app.use ((req, res, next) => {
+app.use ((req, res, done) => {
   console.log(req.session); console.log(req.user);
-next();
+done();
 });
 
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    next(createError(404));
+app.use(function(req, res, done) {
+    done(createError(404));
 });
   
 // error handler
-app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+app.use((err: HttpError, req: Request, res: Response, done: NextFunction) => {
     res.status(err.status || 500);
-
     res.json({
       status: 'error',
       message: err.message,
