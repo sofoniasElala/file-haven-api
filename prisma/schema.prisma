@@ -18,5 +18,27 @@ model user {
     id Int @id @default(autoincrement())
     username String @db.VarChar(25) @unique
     password String @db.VarChar(64)
+    folders folder[]
+    files file[]
+}
 
+model folder {
+    id Int @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    folderOwner user  @relation(fields: [user_id], references: [id])
+    user_id Int
+    files file[]
+}
+
+model file {
+    id Int @id @default(autoincrement())
+    name String @db.Text
+    size BigInt @db.BigInt
+    type String @db.Text
+    storage_url String @db.Text
+    parentFolder folder  @relation(fields: [folder_id], references: [id])
+    folder_id Int 
+    fileOnwer user  @relation(fields: [user_id], references: [id])
+    user_id Int 
 }
