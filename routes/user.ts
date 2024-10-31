@@ -1,15 +1,14 @@
 import express from "express";
 import passport from "passport";
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from "@prisma/client";
+import { prismaClientInstance } from "../utils";
 import {body, validationResult} from 'express-validator';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 const validationAndSanitationMiddlewareFns_signUp = [
   body('username').trim().isLength({ min: 3, max: 20 }).escape().custom(async (value)=> {
-      const userExists = await prisma.user.findUnique({
+      const userExists = await prismaClientInstance.user.findUnique({
           where: {
               username: value
           }
@@ -52,7 +51,7 @@ router.post('/sign-up', ...validationAndSanitationMiddlewareFns_signUp, async (r
   if(!errors.isEmpty()) {
     res.status(400).json({success: false, sanitizedInputs: req.body, errors: errors})
   } else {
-    const userCreationStatus = await prisma.user.create({
+    const userCreationStatus = await prismaClientInstance.user.create({
       data: {
         username: req.body.username,
         password: await bcrypt.hash(req.body.password, 10)

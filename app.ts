@@ -6,7 +6,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { PrismaClient } from '@prisma/client';
+import { prismaClientInstance } from './utils';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import 'dotenv/config';
 import { Request, Response, NextFunction } from 'express';
@@ -18,7 +18,6 @@ import flash from 'connect-flash';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const prisma = new PrismaClient();
 
 
 const allowList = [`http://localhost:${PORT}`];
@@ -46,7 +45,7 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   store: new PrismaSessionStore(
-    prisma,
+    prismaClientInstance,
     {
       checkPeriod: 10 * 60 * 1000,  //ms - 10 mins
       dbRecordIdIsSessionId: true,
@@ -58,7 +57,7 @@ app.use(passport.session()) //deals with express-session i.e req.user req.sessio
 
 passport.use(new LocalStrategy(async (username, password, done) => {
   try {
-  const user = await prisma.user.findUnique({
+  const user = await prismaClientInstance.user.findUnique({
     where: {
       username: username,
     }
