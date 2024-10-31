@@ -1,7 +1,6 @@
 import express from "express";
 import passport from "passport";
-import bcrypt from 'bcryptjs'
-import * as userController from "../controllers/userController";
+import bcrypt from 'bcryptjs';
 import { PrismaClient } from "@prisma/client";
 import {body, validationResult} from 'express-validator';
 

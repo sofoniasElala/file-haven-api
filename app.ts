@@ -12,7 +12,7 @@ import 'dotenv/config';
 import { Request, Response, NextFunction } from 'express';
 import { HttpError } from './types/errors';
 import bcrypt from 'bcryptjs';
-import indexRouter from './routes/index';
+import userRouter from './routes/user';
 import flash from 'connect-flash';
 
 
@@ -93,7 +93,7 @@ app.use ((req, res, done) => {
 done();
 });
 
-app.use('/', indexRouter);
+app.use('/', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, done) {
