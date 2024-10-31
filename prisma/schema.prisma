@@ -24,6 +24,7 @@ model user {
 
 model folder {
     id Int @id @default(autoincrement())
+    name String @db.VarChar(100) @unique
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     folderOwner user  @relation(fields: [user_id], references: [id])
