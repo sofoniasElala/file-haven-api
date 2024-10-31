@@ -16,6 +16,7 @@ export const folder_get = asyncHandler(async (req, res, done) => {
     console.log(folder)
 });
 
+//POST create folder
 export const folder_create = [
     ...validationAndSanitationMiddlewareFns_folderCreate, 
     asyncHandler(async (req, res, done) => {
@@ -34,6 +35,7 @@ export const folder_create = [
         }
 })]
 
+//DELETE folder
 export const folder_delete = asyncHandler(async (req, res, done) => {
      await prismaClientInstance.folder.delete({
         where: {
@@ -43,6 +45,8 @@ export const folder_delete = asyncHandler(async (req, res, done) => {
     res.status(200).json({success: true})
 });
 
+
+//PUT update folder
 export const folder_update = asyncHandler(async (req, res, done) => {
     const updatedFolder = await prismaClientInstance.folder.update({
         where: {
