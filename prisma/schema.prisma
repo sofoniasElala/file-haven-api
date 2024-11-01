@@ -30,7 +30,10 @@ model folder {
     updatedAt DateTime @updatedAt
     folderOwner user  @relation(fields: [user_id], references: [id])
     user_id Int
+    parentFolder folder?  @relation("folderTofolder", fields: [folder_id], references: [id])
+    folder_id Int?
     files file[]
+    folders folder[] @relation("folderTofolder")
 }
 
 model file {

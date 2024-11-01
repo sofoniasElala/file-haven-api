@@ -3,6 +3,7 @@ import * as folder_controller from '../controllers/folderController'
 
 const router = express.Router();
 
+router.post('/:folderId', folder_controller.folder_create); //create folder in folder
 router.post('/', folder_controller.folder_create);
 router.get('/:folderId', folder_controller.folder_get);
 router.put('/:folderId', folder_controller.folder_update)

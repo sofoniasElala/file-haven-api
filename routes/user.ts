@@ -54,7 +54,11 @@ router.post('/logout', async (req, res, done) => {
 router.get('/', async (req, res, done)=> {
 
   const [folders, folderLessFiles] = await Promise.all([
-    prismaClientInstance.folder.findMany(),
+    prismaClientInstance.folder.findMany({
+      where: {
+        folder_id: null
+      }
+    }),
     prismaClientInstance.file.findMany({
       where: {
         folder_id: null

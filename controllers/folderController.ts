@@ -11,10 +11,11 @@ export const folder_get = asyncHandler(async (req, res, done) => {
         },
         include: {
             files: true,
+            folders: true
         }
     });
     if(!folder) res.status(401).json({success: false, folder: folder})
-    else res.status(200).json({success: true, folder: folder})
+    else res.status(200).json({success: true, folder: {...folder, files: folder.files.map(file => {return {...file, size: file.size.toString()}})}}) //converted to string bc json can't handle bigInt
         
 });
 
@@ -23,15 +24,18 @@ export const folder_create = [
     ...validationAndSanitationMiddlewareFns_folderCreate, 
     asyncHandler(async (req, res, done) => {
         const errors = validationResult(req);
+        let dataObject: any =  {
+                name: req.body.name,
+                user_id: Number(req.user)
+            }
         if(!errors.isEmpty()){
             res.status(400).json({success: false, sanitizedInputs: req.body, errors: errors})
         } else {
-            const folderCreation = await prismaClientInstance.folder.create({
-                data: {
-                    name: req.body.name,
-                    user_id: Number(req.user)
-                }
-            });
+
+            if(req.params?.folderId){
+                dataObject =  {...dataObject, folder_id: Number(req.params.folderId)}
+            }
+            const folderCreation = await prismaClientInstance.folder.create({data: dataObject});
             res.status(200).json({success: true, folder: folderCreation});
         }
 })]
