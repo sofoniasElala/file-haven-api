@@ -26,7 +26,6 @@ export const file_create = asyncHandler(async (req, res, done) => {
             folder_id: req.body.folder_id
         }
     });
-        console.log(fileCreation)
         res.status(200).json({success: true, file:  {...fileCreation, size: fileCreation.size.toString()}})
     });
 

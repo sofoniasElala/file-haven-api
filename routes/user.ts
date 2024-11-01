@@ -50,7 +50,7 @@ router.post('/logout', async (req, res, done) => {
   });
 });
 
-/* GET home page. */
+/* GET home page. - must be protected and return only logged in user data*/ 
 router.get('/', async (req, res, done)=> {
 
   const [folders, folderLessFiles] = await Promise.all([
@@ -61,9 +61,8 @@ router.get('/', async (req, res, done)=> {
       }
     })
   ]);
-
-  
-  res.status(200).json({success: true, data: {folders: folders, folderLessFiles: folderLessFiles}})
+  const theFilesWithSizeInString =  folderLessFiles.map(file => {return {...file, size: file.size.toString()}})
+  res.status(200).json({success: true, data: {folders: folders, folderLessFiles: theFilesWithSizeInString}})
 });
 
 export default router;
