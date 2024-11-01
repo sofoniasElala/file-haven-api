@@ -1,28 +1,37 @@
 import { prismaClientInstance } from "../utils";
 import asyncHandler from "express-async-handler";
-import multer from "multer";
 
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
+//GET file
 export const file_get = asyncHandler(async (req, res, done) => {
     const file = await prismaClientInstance.file.findUnique({
         where: {
             id: Number(req.params.fileId)
         }
     });
-    if(!file) res.status(401).json({success: false, file: file})
-    else res.status(200).json({success: true, file: file})
+
+    if(!file) res.status(401).json({success: false})
+    else res.status(200).json({success: true, file: {...file, size: file.size.toString()}})
 });
 
-export const file_create = 
-    asyncHandler(async (req, res, done) => {
-        console.log(req.body);
-        res.status(200).json({success: true})
+
+//POST create file
+export const file_create = asyncHandler(async (req, res, done) => {
+    const fileCreation = await prismaClientInstance.file.create({
+        data: {
+            name: req.body.name,
+            size: req.body.size,
+            type: req.body.type,
+            storage_url: req.body.storage_url,
+            user_id: req.body.user_id,
+            folder_id: req.body.folder_id
+        }
+    });
+        console.log(fileCreation)
+        res.status(200).json({success: true, file:  {...fileCreation, size: fileCreation.size.toString()}})
     });
 
 
+// POST update file
 export const file_update = asyncHandler(async (req, res, done) => {
     const updatedFile = await prismaClientInstance.file.update({
         where: {
@@ -32,9 +41,11 @@ export const file_update = asyncHandler(async (req, res, done) => {
             name: req.body.name
         }
     });
-    res.status(200).json({success: true, updatedFile: updatedFile})
+    res.status(200).json({success: true, file:  {...updatedFile, size: updatedFile.size.toString()}})
 });
 
+
+//DELETE file
 export const file_delete = asyncHandler(async (req, res, done) => {
     await prismaClientInstance.file.delete({
         where: {
