@@ -63,3 +63,4 @@ typings/
 # other files
 thingsToRemember.md
 request.rest
+upload_file.http

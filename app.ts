@@ -13,7 +13,10 @@ import { Request, Response, NextFunction } from 'express';
 import { HttpError } from './types/errors';
 import bcrypt from 'bcryptjs';
 import userRouter from './routes/user';
+import folderRouter from './routes/folder';
+import fileRouter from './routes/file';
 import flash from 'connect-flash';
+import { isAuth } from "./utils";
 
 
 const app = express();
@@ -62,6 +65,7 @@ passport.use(new LocalStrategy(async (username, password, done) => {
       username: username,
     }
   });
+  console.log(user);
   if (!user) { return done(null, false, { message: "Incorrect username" }); }
 
   const match = await bcrypt.compare(password, user.password);
@@ -92,6 +96,8 @@ app.use ((req, res, done) => {
 done();
 });
 
+app.use('/files', isAuth, fileRouter);
+app.use('/folders', isAuth, folderRouter);
 app.use('/', userRouter);
 
 // catch 404 and forward to error handler

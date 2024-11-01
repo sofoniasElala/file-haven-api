@@ -38,8 +38,8 @@ model file {
     size BigInt @db.BigInt
     type String @db.Text
     storage_url String @db.Text
-    parentFolder folder  @relation(fields: [folder_id], references: [id])
-    folder_id Int 
+    parentFolder folder?  @relation(fields: [folder_id], references: [id])
+    folder_id Int? 
     fileOnwer user  @relation(fields: [user_id], references: [id])
     user_id Int 
 }

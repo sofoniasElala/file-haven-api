@@ -13,7 +13,9 @@ export const folder_get = asyncHandler(async (req, res, done) => {
             files: true,
         }
     });
-    console.log(folder)
+    if(!folder) res.status(401).json({success: false, folder: folder})
+    else res.status(200).json({success: true, folder: folder})
+        
 });
 
 //POST create folder
@@ -30,7 +32,6 @@ export const folder_create = [
                     user_id: Number(req.user)
                 }
             });
-            console.log(folderCreation);
             res.status(200).json({success: true, folder: folderCreation});
         }
 })]
