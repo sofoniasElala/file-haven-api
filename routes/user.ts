@@ -43,7 +43,7 @@ router.post('/sign-up', ...validationAndSanitationMiddlewareFns_signUp, async (r
   }
 });
 
-router.post('/logout', function(req, res, done){
+router.post('/logout', async (req, res, done) => {
   req.logout(function(err) {
     if (err) { return done(err); }
     res.status(200).json({success: true})
@@ -51,8 +51,19 @@ router.post('/logout', function(req, res, done){
 });
 
 /* GET home page. */
-router.get('/', function(req, res, done) {
-  res.status(200).json({success: 'homepage'})
+router.get('/', async (req, res, done)=> {
+
+  const [folders, folderLessFiles] = await Promise.all([
+    prismaClientInstance.folder.findMany(),
+    prismaClientInstance.file.findMany({
+      where: {
+        folder_id: null
+      }
+    })
+  ]);
+
+  
+  res.status(200).json({success: true, data: {folders: folders, folderLessFiles: folderLessFiles}})
 });
 
 export default router;
