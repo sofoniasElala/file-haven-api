@@ -23,7 +23,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-const allowList = [`http://localhost:${PORT}`];
+const allowList = [`http://localhost:5173`];
 app.use(cors((req, callback) => {
     let corsOptions;
     if (allowList.indexOf(req.header('Origin') || "") !== -1) {
