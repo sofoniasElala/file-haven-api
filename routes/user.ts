@@ -50,6 +50,15 @@ router.post('/logout', async (req, res, done) => {
   });
 });
 
+
+router.get('/auth/status', (req, res, done) => {
+  if (req.user) {
+    res.status(200).json({ loggedIn: true, user: req.user });
+  } else {
+    res.status(401).json({ loggedIn: false });
+  }
+});
+
 /* GET home page. - must be protected and return only logged in user data*/ 
 router.get('/', async (req, res, done)=> {
 
