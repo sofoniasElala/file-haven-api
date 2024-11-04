@@ -22,7 +22,7 @@ export const file_create = asyncHandler(async (req, res, done) => {
             size: req.body.size,
             type: req.body.type,
             storage_url: req.body.storage_url,
-            user_id: req.body.user_id,
+            user_id: Number(req.user),
             folder_id: req.body.folder_id
         }
     });

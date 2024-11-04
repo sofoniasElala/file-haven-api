@@ -15,7 +15,6 @@ import bcrypt from 'bcryptjs';
 import userRouter from './routes/user';
 import folderRouter from './routes/folder';
 import fileRouter from './routes/file';
-import flash from 'connect-flash';
 import { isAuth } from "./utils";
 
 
@@ -27,14 +26,14 @@ const allowList = [`http://localhost:5173`];
 app.use(cors((req, callback) => {
     let corsOptions;
     if (allowList.indexOf(req.header('Origin') || "") !== -1) {
-        corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+        corsOptions = { origin: true, credentials: true } // reflect (enable) the requested origin in the CORS response
       } else {
         corsOptions = { origin: false } // disable CORS for this request
       }
       callback(null, corsOptions)
 }));
 
-app.use(flash());
+
 app.use(compression());
 app.use(express.json());
 app.use(cookieParser());

@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "passport";
 import bcrypt from 'bcryptjs';
+import { isAuth } from "../utils";
 import { prismaClientInstance, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp } from "../utils";
 import { validationResult} from 'express-validator';
 
@@ -10,20 +11,18 @@ const router = express.Router();
 router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res, done) => {
   passport.authenticate('local', { failureMessage: true }, (err: any, user: Express.User, info: any) => {
     const message = info?.message;
-    const validationErrors = validationResult(req);
-    if(!validationErrors.isEmpty()) {
-      return res.status(400).json({success: false, sanitizedInputs: req.body, errors: message})
-    }
     if (err) { return done(err); }
     if (!user) {
-      // Send custom failure response with the message from `failureMessage`
-      return res.status(401).json({ success: false, message: message});
+      return res.status(401).json({ success: false, sanitizedInputs: req.body, message: message});
     }
 
     // Explicitly log in the user and establish a session
     req.logIn(user, (err) => {
       if (err) { return done(err); }
-      return res.json({ success: true });
+      req.session.save((err) => { //save into session store
+        if (err) { return done(err); }
+        return res.json({ success: true });
+      });
     });
   })(req, res, done);
 });
@@ -52,24 +51,25 @@ router.post('/logout', async (req, res, done) => {
 
 
 router.get('/auth/status', (req, res, done) => {
-  if (req.user) {
-    res.status(200).json({ loggedIn: true, user: req.user });
+  if (req.isAuthenticated()) {
+    res.status(200).json({ loggedIn: true});
   } else {
-    res.status(401).json({ loggedIn: false });
+    res.status(401).json({ loggedIn: false});
   }
 });
 
 /* GET home page. - must be protected and return only logged in user data*/ 
-router.get('/', async (req, res, done)=> {
-
+router.get('/', isAuth, async (req, res, done)=> {
   const [folders, folderLessFiles] = await Promise.all([
     prismaClientInstance.folder.findMany({
       where: {
+        user_id: Number(req.user),
         folder_id: null
       }
     }),
     prismaClientInstance.file.findMany({
       where: {
+        user_id: Number(req.user),
         folder_id: null
       }
     })
