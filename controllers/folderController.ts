@@ -1,6 +1,6 @@
 import { prismaClientInstance } from "../utils";
 import asyncHandler from 'express-async-handler';
-import { validationAndSanitationMiddlewareFns_folderCreate } from "../utils";
+import { validationAndSanitationMiddlewareFns_folderCreate, validationAndSanitationMiddlewareFns_folderUpdate } from "../utils";
 import { validationResult } from "express-validator";
 
 //GET folder and its files
@@ -14,7 +14,7 @@ export const folder_get = asyncHandler(async (req, res, done) => {
             folders: true
         }
     });
-    if(!folder) res.status(401).json({success: false, folder: folder})
+    if(!folder) res.status(401).json({success: false, message: 'Folder does not exist'})
     else res.status(200).json({success: true, folder: {...folder, files: folder.files.map(file => {return {...file, size: file.size.toString()}})}}) //converted to string bc json can't handle bigInt
         
 });
@@ -52,7 +52,7 @@ export const folder_delete = asyncHandler(async (req, res, done) => {
 
 
 //PUT update folder
-export const folder_update = asyncHandler(async (req, res, done) => {
+export const folder_update = [...validationAndSanitationMiddlewareFns_folderUpdate, asyncHandler(async (req, res, done) => {
     const updatedFolder = await prismaClientInstance.folder.update({
         where: {
             id: Number(req.params.folderId)
@@ -62,4 +62,4 @@ export const folder_update = asyncHandler(async (req, res, done) => {
          }
     }); 
     res.status(200).json({success: true, updatedFolder: updatedFolder})
-})
+})]

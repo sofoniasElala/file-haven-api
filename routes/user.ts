@@ -10,10 +10,10 @@ const router = express.Router();
 
 router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res, done) => {
   passport.authenticate('local', { failureMessage: true }, (err: any, user: Express.User, info: any) => {
-    const message = info?.message;
+    const errors = info?.message;
     if (err) { return done(err); }
     if (!user) {
-      return res.status(401).json({ success: false, sanitizedInputs: req.body, message: message});
+      return res.status(401).json({ success: false, errors: errors});
     }
 
     // Explicitly log in the user and establish a session
@@ -30,13 +30,13 @@ router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res,
 router.post('/sign-up', ...validationAndSanitationMiddlewareFns_signUp, async (req, res, done) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()) {
-    res.status(400).json({success: false, sanitizedInputs: req.body, errors: errors})
+    res.status(400).json({success: false, errors: errors})
   } else {
-    const userCreationStatus = await prismaClientInstance.user.create({
-      data: {
-        username: req.body.username,
-        password: await bcrypt.hash(req.body.password, 10)
-      }
+        await prismaClientInstance.user.create({
+          data: {
+            username: req.body.username,
+            password: await bcrypt.hash(req.body.password, 10)
+          }
     });
     res.status(200).json({success: true});
   }
@@ -60,22 +60,33 @@ router.get('/auth/status', (req, res, done) => {
 
 /* GET home page. - must be protected and return only logged in user data*/ 
 router.get('/', isAuth, async (req, res, done)=> {
-  const [folders, folderLessFiles] = await Promise.all([
-    prismaClientInstance.folder.findMany({
+  const foldersAndFolderLessFiles = await prismaClientInstance.user.findUnique({
       where: {
-        user_id: Number(req.user),
-        folder_id: null
+        id: Number(req.user)
+      },
+      select: {
+        id: true,
+        username: true,
+        folders: {
+          where: {
+            folder_id: null
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        },
+        files: {
+          where: {
+            folder_id: null
+          },
+          orderBy: {
+            updatedAt: 'desc'
+          }
+        }
       }
-    }),
-    prismaClientInstance.file.findMany({
-      where: {
-        user_id: Number(req.user),
-        folder_id: null
-      }
-    })
-  ]);
-  const theFilesWithSizeInString =  folderLessFiles.map(file => {return {...file, size: file.size.toString()}})
-  res.status(200).json({success: true, data: {folders: folders, folderLessFiles: theFilesWithSizeInString}})
+    });
+  const allDataWithFilesSizeInString = {...foldersAndFolderLessFiles, files: foldersAndFolderLessFiles?.files.map(file => {return {...file, size: file.size.toString()}})} //foldersAndFolderLessFiles.map(file => {return {...file, size: file.size.toString()}})
+  res.status(200).json({success: true, data: allDataWithFilesSizeInString})
 });
 
 export default router;

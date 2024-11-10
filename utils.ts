@@ -1,5 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import { body } from 'express-validator';
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.SUPABASE_PROJECT_URL!
+const supabaseKey = process.env.SUPABASE_ANON_KEY!
+
+const supabaseClientInstance = createClient(supabaseUrl, supabaseKey)
 const prismaClientInstance = new PrismaClient();
 
 const isAuth = (req: any, res: any, done: any) => {
@@ -36,5 +42,8 @@ const validationAndSanitationMiddlewareFns_signUp = [
     body('name').trim().escape(),
     body('user_id').trim().escape()
   ]
+  const validationAndSanitationMiddlewareFns_folderUpdate = [
+    body('name').trim().escape()
+  ]
 
-export {prismaClientInstance, isAuth, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp, validationAndSanitationMiddlewareFns_folderCreate}
+export {supabaseClientInstance, prismaClientInstance, isAuth, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp, validationAndSanitationMiddlewareFns_folderCreate, validationAndSanitationMiddlewareFns_folderUpdate}
