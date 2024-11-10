@@ -41,7 +41,10 @@ model file {
     name String @db.Text
     size BigInt @db.BigInt
     type String @db.Text
+    storage_path String @db.Text
     storage_url String @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
     parentFolder folder?  @relation(fields: [folder_id], references: [id])
     folder_id Int? 
     fileOnwer user  @relation(fields: [user_id], references: [id])
