@@ -1,7 +1,7 @@
 import { prismaClientInstance, supabaseClientInstance } from "../utils";
 import { SupabaseStorageError } from "../types/supabase";
 import asyncHandler from "express-async-handler";
-import { decode } from "base64-arraybuffer";
+import { decode, encode } from "base64-arraybuffer";
 
 //GET file
 export const file_get = asyncHandler(async (req, res, done) => {
@@ -25,12 +25,19 @@ export const file_create = asyncHandler(async (req, res, done) => {
     // upload the file to supabase
     const { data, error }: {data: {id: string; path: string; fullPath: string;} | null, error:SupabaseStorageError | null} = await supabaseClientInstance.storage
       .from("file-haven-files")
-      .upload(file!.originalname, fileBase64, {
+      .upload(req.user + '/' + file!.originalname, fileBase64, {
         contentType: file!.mimetype,
       });
       console.log("supabase", data, error);
       if(error){
-        const errorMessage = error.statusCode == '400' ? 'Avoid special characters in name' : 'The file already exists';
+        let errorMessage;
+        if(error.statusCode == '400' ){
+         errorMessage =  'Avoid special characters in name';
+        } else if(error.statusCode == '413'){
+            errorMessage = 'File exceeds maximum allowed size'
+        } else {
+            errorMessage = 'The file already exists';
+        }
         res.status(400).json({success: false, message: errorMessage})
         return;
       }
@@ -55,16 +62,18 @@ export const file_create = asyncHandler(async (req, res, done) => {
 
 // POST update file
 export const file_update = asyncHandler(async (req, res, done) => {
-    const { data, error } = await supabaseClientInstance.storage
+    await supabaseClientInstance.storage
             .from("file-haven-files")
-            .move(req.body.originalName, req.body.name);
+            .move(req.user + '/' + req.body.originalName, req.user + '/' + req.body.name);
 
     const updatedFile = await prismaClientInstance.file.update({
         where: {
             id: Number(req.params.fileId)
         },
         data: {
-            name: req.body.name
+            name: req.body.name,
+            storage_path: 'file-haven-files/' + req.user + '/' + req.body.name,
+            storage_url: process.env.SUPABASE_PROJECT_URL + '/storage/v1/object/public/file-haven-files/' + req.user + '/' +  req.body.name
         }
     });
     res.status(200).json({success: true, file:  {...updatedFile, size: updatedFile.size.toString()}})
@@ -73,10 +82,25 @@ export const file_update = asyncHandler(async (req, res, done) => {
 
 //DELETE file
 export const file_delete = asyncHandler(async (req, res, done) => {
+    const  {error} = await supabaseClientInstance.storage
+    .from("file-haven-files")
+    .remove([req.user + '/' + req.body.name]);
+
     await prismaClientInstance.file.delete({
         where: {
             id: Number(req.params.fileId)
         }
     });
     res.status(200).json({success: true})
+})
+
+//GET blob for download
+export const file_download = asyncHandler(async (req, res, done) => {
+    const { data, error } = await supabaseClientInstance.storage
+                .from("file-haven-files")
+                .download(req.user + '/' + req.params.fileName);
+    const blobArrayBuffer = await data?.arrayBuffer();
+    if(!error) res.status(200).json({success: true, base64File: encode(blobArrayBuffer!), type: data.type});
+    else res.status(400).json({success: false, message: "Unable to download file"});
+
 })

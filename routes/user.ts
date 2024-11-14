@@ -4,12 +4,13 @@ import bcrypt from 'bcryptjs';
 import { isAuth } from "../utils";
 import { prismaClientInstance, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp } from "../utils";
 import { validationResult} from 'express-validator';
+import * as user_controller from '../controllers/userController';
 
 const router = express.Router();
 
 
 router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res, done) => {
-  passport.authenticate('local', { failureMessage: true }, (err: any, user: Express.User, info: any) => {
+  passport.authenticate('local', { failureMessage: true }, (err: any, user: any, info: any) => {
     const errors = info?.message;
     if (err) { return done(err); }
     if (!user) {
@@ -21,7 +22,7 @@ router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res,
       if (err) { return done(err); }
       req.session.save((err) => { //save into session store
         if (err) { return done(err); }
-        return res.json({ success: true });
+        return res.json({ success: true, username: user.username });
       });
     });
   })(req, res, done);
@@ -41,6 +42,7 @@ router.post('/sign-up', ...validationAndSanitationMiddlewareFns_signUp, async (r
     res.status(200).json({success: true});
   }
 });
+router.post('/user/delete', isAuth, user_controller.user_delete);
 
 router.post('/logout', async (req, res, done) => {
   req.logout(function(err) {

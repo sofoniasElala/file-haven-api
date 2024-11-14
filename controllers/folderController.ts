@@ -7,7 +7,8 @@ import { validationResult } from "express-validator";
 export const folder_get = asyncHandler(async (req, res, done) => {
     const folder = await prismaClientInstance.folder.findUnique({
         where: {
-            id: Number(req.params.folderId)
+            id: Number(req.params.folderId),
+            user_id: Number(req.user)
         },
         include: {
             files: true,
@@ -26,7 +27,8 @@ export const folder_create = [
         const errors = validationResult(req);
         let dataObject: any =  {
                 name: req.body.name,
-                user_id: Number(req.user)
+                user_id: Number(req.user),
+                folder_id: req.params.folderId ? Number(req.params.folderId) : null
             }
         if(!errors.isEmpty()){
             res.status(400).json({success: false, sanitizedInputs: req.body, errors: errors})
