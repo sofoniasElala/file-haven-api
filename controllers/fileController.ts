@@ -36,7 +36,7 @@ export const file_create = asyncHandler(async (req, res, done) => {
         } else if(error.statusCode == '413'){
             errorMessage = 'File exceeds maximum allowed size'
         } else {
-            errorMessage = 'The file already exists';
+            errorMessage = 'A file with that name already exists';
         }
         res.status(400).json({success: false, message: errorMessage})
         return;

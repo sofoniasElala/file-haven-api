@@ -1,4 +1,4 @@
-import { prismaClientInstance } from "../utils";
+import { getSortByDirection, prismaClientInstance } from "../utils";
 import asyncHandler from 'express-async-handler';
 import { validationAndSanitationMiddlewareFns_folderCreate, validationAndSanitationMiddlewareFns_folderUpdate } from "../utils";
 import { validationResult } from "express-validator";
@@ -10,10 +10,25 @@ export const folder_get = asyncHandler(async (req, res, done) => {
             id: Number(req.params.folderId),
             user_id: Number(req.user)
         },
-        include: {
-            files: true,
-            folders: true
-        }
+        select: {
+            id: true,
+            name: true,
+            updatedAt: true,
+            folder_id: true,
+            user_id: true,
+            folders: {
+              orderBy: {
+                updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
+                name: getSortByDirection(String(req.query.sortByName))
+              }
+            },
+            files: {
+              orderBy: {
+                updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
+                name: getSortByDirection(String(req.query.sortByName))
+              }
+            }
+          }
     });
     if(!folder) res.status(401).json({success: false, message: 'Folder does not exist'})
     else res.status(200).json({success: true, folder: {...folder, files: folder.files.map(file => {return {...file, size: file.size.toString()}})}}) //converted to string bc json can't handle bigInt

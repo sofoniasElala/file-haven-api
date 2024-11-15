@@ -46,4 +46,10 @@ const validationAndSanitationMiddlewareFns_signUp = [
     body('name').trim().escape()
   ]
 
-export {supabaseClientInstance, prismaClientInstance, isAuth, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp, validationAndSanitationMiddlewareFns_folderCreate, validationAndSanitationMiddlewareFns_folderUpdate}
+  const getSortByDirection = (column: string) => {
+    if(column === 'undefined') return undefined
+    else if(column === 'desc') return 'desc';
+    else return 'asc';
+  }
+
+export {supabaseClientInstance, prismaClientInstance, isAuth, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp, validationAndSanitationMiddlewareFns_folderCreate, validationAndSanitationMiddlewareFns_folderUpdate, getSortByDirection}

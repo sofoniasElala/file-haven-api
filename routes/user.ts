@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import bcrypt from 'bcryptjs';
 import { isAuth } from "../utils";
-import { prismaClientInstance, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp } from "../utils";
+import { prismaClientInstance, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp, getSortByDirection } from "../utils";
 import { validationResult} from 'express-validator';
 import * as user_controller from '../controllers/userController';
 
@@ -31,7 +31,7 @@ router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res,
 router.post('/sign-up', ...validationAndSanitationMiddlewareFns_signUp, async (req, res, done) => {
   const errors = validationResult(req);
   if(!errors.isEmpty()) {
-    res.status(400).json({success: false, errors: errors})
+    res.status(400).json({success: false, errors: errors.array()[0].msg})
   } else {
         await prismaClientInstance.user.create({
           data: {
@@ -74,7 +74,8 @@ router.get('/', isAuth, async (req, res, done)=> {
             folder_id: null
           },
           orderBy: {
-            updatedAt: 'desc'
+            updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
+            name: getSortByDirection(String(req.query.sortByName))
           }
         },
         files: {
@@ -82,7 +83,8 @@ router.get('/', isAuth, async (req, res, done)=> {
             folder_id: null
           },
           orderBy: {
-            updatedAt: 'desc'
+            updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
+            name: getSortByDirection(String(req.query.sortByName))
           }
         }
       }
