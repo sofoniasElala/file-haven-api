@@ -13,9 +13,7 @@ export const folder_get = asyncHandler(async (req, res, done) => {
         select: {
             id: true,
             name: true,
-            updatedAt: true,
             folder_id: true,
-            user_id: true,
             folders: {
               orderBy: {
                 updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
@@ -30,8 +28,19 @@ export const folder_get = asyncHandler(async (req, res, done) => {
             }
           }
     });
+    let folder_name: any = {name: null}
+    if(folder?.folder_id){
+     folder_name =  await prismaClientInstance.folder.findUnique({
+        where: {
+            id: folder?.folder_id!
+        },
+        select: {
+            name: true
+        }
+     });
+    }
     if(!folder) res.status(401).json({success: false, message: 'Folder does not exist'})
-    else res.status(200).json({success: true, folder: {...folder, files: folder.files.map(file => {return {...file, size: file.size.toString()}})}}) //converted to string bc json can't handle bigInt
+    else res.status(200).json({success: true, parentFolderName: folder_name.name,  folder: {...folder, files: folder.files.map(file => {return {...file, size: file.size.toString()}})}}) //converted to string bc json can't handle bigInt
         
 });
 

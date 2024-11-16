@@ -88,12 +88,6 @@ passport.deserializeUser((userId: any, done) => {
 
 });
 
-//TODO: DELETE THIS AFTER TESTING
-app.use ((req, res, done) => {
-  console.log(req.session); console.log(req.user);
-done();
-});
-
 app.use('/files', isAuth, fileRouter);
 app.use('/folders', isAuth, folderRouter);
 app.use('/', userRouter);

@@ -19,7 +19,6 @@ export const file_get = asyncHandler(async (req, res, done) => {
 //POST create file
 export const file_create = asyncHandler(async (req, res, done) => {
     const file = req.file;
-    console.log('multer FILE: ', file);
     // decode file buffer to base64
     const fileBase64 = decode(file!.buffer.toString("base64"));
     // upload the file to supabase
@@ -28,7 +27,6 @@ export const file_create = asyncHandler(async (req, res, done) => {
       .upload(req.user + '/' + file!.originalname, fileBase64, {
         contentType: file!.mimetype,
       });
-      console.log("supabase", data, error);
       if(error){
         let errorMessage;
         if(error.statusCode == '400' ){
@@ -44,7 +42,6 @@ export const file_create = asyncHandler(async (req, res, done) => {
       const publicUrl = supabaseClientInstance.storage
                 .from("file-haven-files")
                 .getPublicUrl(data!.path);
-        console.log('publicUrlData', publicUrl)
     const fileCreation = await prismaClientInstance.file.create({
         data: {
             name: file?.originalname!,
