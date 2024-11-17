@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-const allowList = [`http://localhost:5173`];
+const allowList = [`http://localhost:5173`, 'https://sofonias-elala-file-haven.netlify.app/'];
 app.use(cors((req, callback) => {
     let corsOptions;
     if (allowList.indexOf(req.header('Origin') || "") !== -1) {
@@ -41,7 +41,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(session({
   cookie: {
    maxAge: 7 * 24 * 60 * 60 * 1000, // ms - 1 week
-   //secure: true     // its disabled in dev bc it requires https connection and localhost doesn't have that
+   secure: true,     // its disabled in dev bc it requires https connection and localhost doesn't have that
+   sameSite: 'none'
   },
   secret: process.env.ACCESS_TOKEN_SECRET || "",
   resave: true,
