@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-const allowList = [`http://localhost:5173`, 'https://sofonias-elala-file-haven.netlify.app'];
+const allowList = [`http://localhost:5173`, 'https://sofonias-elala-file-haven.glitch.me'];
 app.use(cors((req, callback) => {
     let corsOptions;
     if (allowList.indexOf(req.header('Origin') || "") !== -1) {
@@ -34,6 +34,7 @@ app.use(cors((req, callback) => {
 }));
 
 
+app.set('trust proxy', 1) // apparently Glitch routes web traffic through their proxy so this is needed
 app.use(compression());
 app.use(express.json());
 app.use(cookieParser());
@@ -41,8 +42,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(session({
   cookie: {
    maxAge: 7 * 24 * 60 * 60 * 1000, // ms - 1 week
-   secure: true,     // its disabled in dev bc it requires https connection and localhost doesn't have that
-   sameSite: 'none'
+   secure: true,
+   sameSite: "none"
   },
   secret: process.env.ACCESS_TOKEN_SECRET || "",
   resave: true,
@@ -56,6 +57,7 @@ app.use(session({
     }
   )
 }))
+
 app.use(passport.session()) //deals with express-session i.e req.user req.session
 
 passport.use(new LocalStrategy(async (username, password, done) => {
