@@ -1,47 +1,13 @@
 import express from "express";
-import passport from "passport";
-import bcrypt from 'bcryptjs';
 import { isAuth } from "../utils";
-import { prismaClientInstance, validationAndSanitationMiddlewareFns_logIn, validationAndSanitationMiddlewareFns_signUp, getSortByDirection } from "../utils";
-import { validationResult} from 'express-validator';
 import * as user_controller from '../controllers/userController';
 
 const router = express.Router();
 
 
-router.post('/log-in', ...validationAndSanitationMiddlewareFns_logIn, (req, res, done) => {
-  passport.authenticate('local', { failureMessage: true }, (err: any, user: any, info: any) => {
-    const errors = info?.message;
-    if (err) { return done(err); }
-    if (!user) {
-      return res.status(401).json({ success: false, errors: errors});
-    }
+router.post('/log-in',  user_controller.user_logIn);
 
-    // Explicitly log in the user and establish a session
-    req.logIn(user, (err) => {
-      if (err) { return done(err); }
-      req.session.save((err) => { //save into session store
-        if (err) { return done(err); }
-        return res.json({ success: true, username: user.username });
-      });
-    });
-  })(req, res, done);
-});
-
-router.post('/sign-up', ...validationAndSanitationMiddlewareFns_signUp, async (req, res, done) => {
-  const errors = validationResult(req);
-  if(!errors.isEmpty()) {
-    res.status(400).json({success: false, errors: errors.array()[0].msg})
-  } else {
-        await prismaClientInstance.user.create({
-          data: {
-            username: req.body.username,
-            password: await bcrypt.hash(req.body.password, 10)
-          }
-    });
-    res.status(200).json({success: true});
-  }
-});
+router.post('/sign-up', user_controller.user_signUp);
 router.post('/user/delete', isAuth, user_controller.user_delete);
 
 router.post('/logout', async (req, res, done) => {
@@ -61,36 +27,6 @@ router.get('/auth/status', (req, res, done) => {
 });
 
 /* GET home page. - must be protected and return only logged in user data*/ 
-router.get('/', isAuth, async (req, res, done)=> {
-  const foldersAndFolderLessFiles = await prismaClientInstance.user.findUnique({
-      where: {
-        id: Number(req.user)
-      },
-      select: {
-        id: true,
-        username: true,
-        folders: {
-          where: {
-            folder_id: null
-          },
-          orderBy: {
-            updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
-            name: getSortByDirection(String(req.query.sortByName))
-          }
-        },
-        files: {
-          where: {
-            folder_id: null
-          },
-          orderBy: {
-            updatedAt: getSortByDirection(String(req.query.sortByUpdatedAt)),
-            name: getSortByDirection(String(req.query.sortByName))
-          }
-        }
-      }
-    });
-  const allDataWithFilesSizeInString = {...foldersAndFolderLessFiles, files: foldersAndFolderLessFiles?.files.map(file => {return {...file, size: file.size.toString()}})} //foldersAndFolderLessFiles.map(file => {return {...file, size: file.size.toString()}})
-  res.status(200).json({success: true, data: allDataWithFilesSizeInString})
-});
+router.get('/', isAuth, user_controller.user_home);
 
 export default router;
