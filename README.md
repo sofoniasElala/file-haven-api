@@ -38,9 +38,10 @@ ___
 ___
 
 ## Technologies Used:
-  * Typescript 
+  * TypeScript 
   * NodeJS - Express
   * Postgresql on Supabase - database
   * Supabase storage - file storage 
   * Passport local + prisma session - authentication/authorization
+  * Multer - file upload handler
   * Glitch for hosting
