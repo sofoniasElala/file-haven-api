@@ -38,6 +38,7 @@ ___
 ___
 
 ## Technologies Used:
+  * Typescript 
   * NodeJS - Express
   * Postgresql on Supabase - database
   * Supabase storage - file storage 
