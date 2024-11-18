@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-const allowList = [`http://localhost:5173`, 'https://sofonias-elala-file-haven.glitch.me'];
+const allowList = ['https://sofonias-elala-file-haven.netlify.app'];
 app.use(cors((req, callback) => {
     let corsOptions;
     if (allowList.indexOf(req.header('Origin') || "") !== -1) {
