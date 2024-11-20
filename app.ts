@@ -34,6 +34,10 @@ app.use(cors((req, callback) => {
       callback(null, corsOptions)
 }));   
 **/
+app.use(cors({
+  origin: 'https://sofonias-elala-file-haven.xyz', 
+  credentials: true
+}));
 
 
 app.set('trust proxy', 1) // apparently Glitch routes web traffic through their proxy so this is needed
@@ -45,8 +49,7 @@ app.use(session({
   cookie: {
    maxAge: 7 * 24 * 60 * 60 * 1000, // ms - 1 week
    secure: true,
-   sameSite: 'strict',
-   domain: '.sofonias-elala-file-haven.xyz'
+   sameSite: 'strict'
   },
   secret: process.env.ACCESS_TOKEN_SECRET || "",
   resave: true,
