@@ -22,7 +22,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-const allowList = ['https://sofonias-elala-file-haven.netlify.app'];
+/**  --- for netlify + glitch ---
+ * const allowList = ['https://sofonias-elala-file-haven.netlify.app'];
 app.use(cors((req, callback) => {
     let corsOptions;
     if (allowList.indexOf(req.header('Origin') || "") !== -1) {
@@ -31,7 +32,8 @@ app.use(cors((req, callback) => {
         corsOptions = { origin: false } // disable CORS for this request
       }
       callback(null, corsOptions)
-}));
+}));   
+**/
 
 
 app.set('trust proxy', 1) // apparently Glitch routes web traffic through their proxy so this is needed
@@ -43,7 +45,8 @@ app.use(session({
   cookie: {
    maxAge: 7 * 24 * 60 * 60 * 1000, // ms - 1 week
    secure: true,
-   sameSite: "none"
+   sameSite: 'strict',
+   domain: '.sofonias-elala-file-haven.xyz'
   },
   secret: process.env.ACCESS_TOKEN_SECRET || "",
   resave: true,
