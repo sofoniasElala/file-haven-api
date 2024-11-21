@@ -1,7 +1,7 @@
 # ***File Haven*** API
 ## Description
 File Haven API is a simple RESTful API for managing ***File Haven*** files, folders, and users. It allows a user to perform basic CRUD operations on their files, and folders, and it supports user authentication.  
-[![Static Badge](https://img.shields.io/badge/Live%20API-blue)](https://sofonias-elala-file-haven-api.glitch.me/) [![Static Badge](https://img.shields.io/badge/NodeJS%20Server%20on%20Glitch-purple)](https://glitch.com/~sofonias-elala-file-haven-api)
+[![Static Badge](https://img.shields.io/badge/Live%20API-blue)](https://api.sofonias-elala-file-haven.xyz)
 
 ## Features
 
@@ -44,4 +44,4 @@ ___
   * Supabase storage - file storage 
   * Passport local + prisma session - authentication/authorization
   * Multer - file upload handler
-  * Glitch for hosting
+  * Render for hosting
