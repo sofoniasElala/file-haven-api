@@ -12,7 +12,7 @@ File Haven API is a simple RESTful API for managing ***File Haven*** files, fold
 
 ## Link to ***File Haven*** front-end repo
  * [![Static Badge](https://img.shields.io/badge/File%20Haven-green)](https://github.com/sofoniasElala/file-haven)
-### postgresql database schema
+### PostgreSQL Database Schema
 ![schema](https://github.com/sofoniasElala/file-haven-api/blob/main/file-haven.png)
 
 ### Endpoints
