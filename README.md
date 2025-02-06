@@ -10,10 +10,10 @@ File Haven API is a simple RESTful API for managing ***File Haven*** files, fold
 - sort by name and last modified
 - download files
 
-## Link to ***File Haven*** front-end repo
- * [![Static Badge](https://img.shields.io/badge/File%20Haven-green)](https://github.com/sofoniasElala/file-haven)
 ## Link to ***File Haven*** Java Rest API repo
  * [![Static Badge](https://img.shields.io/badge/File%20Haven%20Java%20API-darkgreen)](https://github.com/sofoniasElala/file-haven-java-api)
+## Link to ***File Haven*** front-end repo
+ * [![Static Badge](https://img.shields.io/badge/File%20Haven-green)](https://github.com/sofoniasElala/file-haven)
 ### PostgreSQL Database Schema
 ![schema](https://github.com/sofoniasElala/file-haven-api/blob/main/file-haven.png)
 
